@@ -60,19 +60,7 @@ Known limitations:
 - Re-surgery underestimated for SSLF (S5→S7 rate calibrated on SCP only)
 - Pessary crossover overestimated in high surgical availability settings
 
-## Files
 
-```
-├── index.html        # Clinical interface (GitHub Pages)
-├── model.js          # Model logic (translated from R)
-├── params.js         # Parameters from 28 papers
-├── README.md
-└── R/
-    ├── parametri_twin.R      # Full parameterization
-    ├── msm_skeleton.R        # Model structure + sensitivity analysis
-    ├── simulazione_twin.R    # Monte Carlo simulation
-    └── validazione_esterna.R # External validation
-```
 
 ## Deployment on GitHub Pages
 
@@ -89,12 +77,6 @@ Known limitations:
 
 Mauriziano Umberto I Hospital, Turin, Italy  
 Department of Obstetrics and Gynecology
-
-## Status
-
-- [x] Paper 1: Literature parameterization + external validation
-- [ ] Paper 2: Bayesian updating with Mauriziano prospective data
-- [ ] Paper 3: Supervised clinical use
 
 ## License
 
