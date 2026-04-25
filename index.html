@@ -3,289 +3,311 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>POP Digital Twin — DSS</title>
+  <title>POP Decision Support</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.min.js"></script>
   <style>
-    /* ===== RESET & BASE ===== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:         #0d1117;
-      --bg2:        #161b22;
-      --bg3:        #21262d;
-      --border:     #30363d;
-      --text:       #e6edf3;
-      --text2:      #8b949e;
-      --text3:      #6e7681;
-      --accent:     #2f81f7;
-      --accent2:    #388bfd;
-      --green:      #3fb950;
-      --orange:     #d29922;
-      --red:        #f85149;
-      --purple:     #bc8cff;
-      --teal:       #39d353;
-      --font-mono:  "JetBrains Mono", "Fira Code", monospace;
-      --font-ui:    "Inter", system-ui, sans-serif;
-      --radius:     6px;
-      --radius-lg:  12px;
+      --white:      #ffffff;
+      --bg:         #f8f9fa;
+      --bg2:        #f1f3f5;
+      --border:     #e9ecef;
+      --border2:    #ced4da;
+      --text:       #212529;
+      --text2:      #495057;
+      --text3:      #adb5bd;
+      --accent:     #1971c2;
+      --accent-bg:  #e7f5ff;
+      --accent-lt:  #d0ebff;
+      --green:      #2f9e44;
+      --green-bg:   #ebfbee;
+      --orange:     #e67700;
+      --orange-bg:  #fff9db;
+      --red:        #c92a2a;
+      --red-bg:     #fff5f5;
+      --purple:     #6741d9;
+      --purple-bg:  #f3f0ff;
+      --teal:       #0c8599;
+      --teal-bg:    #e3fafc;
+      --radius:     8px;
+      --shadow:     0 1px 4px rgba(0,0,0,0.07);
+      --shadow-md:  0 4px 16px rgba(0,0,0,0.08);
     }
 
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: var(--font-ui);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 14px;
-      line-height: 1.6;
+      line-height: 1.5;
       min-height: 100vh;
     }
 
-    /* ===== LAYOUT ===== */
+    /* HEADER */
     .header {
-      background: var(--bg2);
+      background: var(--white);
       border-bottom: 1px solid var(--border);
-      padding: 16px 24px;
+      padding: 0 28px;
+      height: 52px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 200;
+      box-shadow: var(--shadow);
     }
 
-    .header-logo {
-      width: 32px; height: 32px;
-      background: linear-gradient(135deg, var(--accent), var(--purple));
-      border-radius: var(--radius);
+    .hmark {
+      width: 26px; height: 26px;
+      background: var(--accent);
+      border-radius: 5px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px; font-weight: 700; color: white;
+      color: white; font-size: 12px; font-weight: 700;
       flex-shrink: 0;
     }
 
-    .header-title { font-size: 15px; font-weight: 600; }
-    .header-subtitle { font-size: 12px; color: var(--text2); }
+    .htitle { font-size: 14px; font-weight: 600; }
+    .hdot   { color: var(--border2); }
+    .hsub   { font-size: 12px; color: var(--text3); }
 
-    .header-badge {
-      margin-left: auto;
-      background: rgba(47,129,247,0.15);
-      border: 1px solid rgba(47,129,247,0.3);
-      color: var(--accent2);
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 500;
-    }
-
-    .main {
-      max-width: 1100px;
+    /* LAYOUT */
+    .wrap {
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 24px 24px 60px;
+      padding: 24px 20px 80px;
       display: grid;
       grid-template-columns: 380px 1fr;
-      gap: 24px;
+      gap: 20px;
       align-items: start;
     }
 
-    /* ===== PANEL ===== */
-    .panel {
-      background: var(--bg2);
+    /* CARD */
+    .card {
+      background: var(--white);
       border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
     }
 
-    .panel-header {
-      padding: 14px 18px;
+    .card-head {
+      padding: 13px 18px;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .panel-header h2 {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-    }
+    .card-head h2 { font-size: 13px; font-weight: 600; }
 
-    .panel-icon {
+    .cicon {
       width: 20px; height: 20px;
-      background: var(--bg3);
       border-radius: 4px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 11px;
+      font-size: 11px; flex-shrink: 0;
     }
 
-    .panel-body { padding: 18px; }
+    .ci-blue  { background: var(--accent-bg); }
+    .ci-green { background: var(--green-bg); }
 
-    /* ===== TABS ===== */
-    .tabs {
-      display: flex;
-      gap: 2px;
-      background: var(--bg3);
-      padding: 3px;
-      border-radius: var(--radius);
-      margin-bottom: 18px;
-    }
+    .card-body { padding: 18px; }
 
-    .tab {
-      flex: 1;
-      padding: 6px 10px;
-      border: none;
-      border-radius: 4px;
-      background: transparent;
-      color: var(--text2);
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
+    /* SEZIONI */
+    .fsec { margin-bottom: 20px; }
+    .fsec:last-child { margin-bottom: 0; }
 
-    .tab.active {
-      background: var(--bg2);
-      color: var(--text);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    }
-
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    /* ===== FORM ===== */
-    .form-group { margin-bottom: 14px; }
-
-    .form-label {
-      display: block;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text2);
-      margin-bottom: 5px;
-    }
-
-    .form-label span {
+    .fsec-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
       color: var(--text3);
-      font-weight: 400;
-      font-size: 11px;
+      margin-bottom: 10px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid var(--border);
     }
 
-    .form-control {
-      width: 100%;
-      background: var(--bg3);
-      border: 1px solid var(--border);
+    /* SITUAZIONE */
+    .sit-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .sit-btn {
+      border: 1.5px solid var(--border2);
       border-radius: var(--radius);
+      background: var(--white);
+      padding: 10px 6px 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .sit-btn:hover { border-color: var(--accent); background: var(--accent-bg); }
+
+    .sit-btn.active {
+      border-color: var(--accent);
+      background: var(--accent-bg);
+    }
+
+    .sit-ico { font-size: 18px; line-height: 1; }
+
+    .sit-lbl {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text2);
+      line-height: 1.3;
+    }
+
+    .sit-btn.active .sit-lbl { color: var(--accent); }
+
+    /* Sezione contestuale */
+    .ctx {
+      display: none;
+      margin-top: 10px;
+      padding: 12px;
+      background: var(--bg);
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .ctx.on { display: block; }
+
+    /* FORM */
+    .fg { margin-bottom: 8px; }
+    .fg:last-child { margin-bottom: 0; }
+
+    .fl {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text2);
+      margin-bottom: 3px;
+    }
+
+    .fl .u { color: var(--text3); font-weight: 400; }
+
+    .fc {
+      width: 100%;
+      background: var(--white);
+      border: 1px solid var(--border2);
+      border-radius: 5px;
       color: var(--text);
       font-size: 13px;
-      padding: 7px 10px;
+      padding: 6px 9px;
       outline: none;
-      transition: border-color 0.15s;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -webkit-appearance: none;
       appearance: none;
     }
 
-    .form-control:focus { border-color: var(--accent); }
+    .fc:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(25,113,194,0.12);
+    }
 
-    select.form-control {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b949e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    select.fc {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' viewBox='0 0 9 5'%3E%3Cpath fill='%23adb5bd' d='M4.5 5L0 0h9z'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
-      background-position: right 10px center;
-      padding-right: 28px;
+      background-position: right 9px center;
+      padding-right: 26px;
+      cursor: pointer;
     }
 
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+    .fg2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .fg3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 
-    /* Toggle switches */
-    .toggle-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
+    /* Toggle */
+    .tgl-list { display: flex; flex-direction: column; gap: 5px; }
 
-    .toggle-item {
+    .tgl-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 10px;
-      background: var(--bg3);
-      border-radius: var(--radius);
+      padding: 7px 9px;
+      background: var(--white);
       border: 1px solid var(--border);
+      border-radius: 5px;
+      gap: 8px;
     }
 
-    .toggle-label {
-      font-size: 12px;
-      color: var(--text);
-    }
+    .tgl-info { flex: 1; }
 
-    .toggle-label small {
-      display: block;
-      color: var(--text3);
-      font-size: 11px;
-    }
+    .tgl-lbl { font-size: 12px; font-weight: 500; color: var(--text); }
+    .tgl-sub { font-size: 10px; color: var(--text3); display: block; margin-top: 1px; }
 
-    .toggle {
-      position: relative;
-      width: 36px; height: 20px;
-      flex-shrink: 0;
-    }
-
-    .toggle input { opacity: 0; width: 0; height: 0; }
-
-    .toggle-slider {
-      position: absolute;
-      inset: 0;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 20px;
+    .sw { position: relative; width: 34px; height: 18px; flex-shrink: 0; }
+    .sw input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .sw-t {
+      position: absolute; inset: 0;
+      background: var(--border2);
+      border-radius: 18px;
       cursor: pointer;
-      transition: 0.2s;
+      transition: background 0.18s;
     }
-
-    .toggle-slider::before {
+    .sw-t::before {
       content: "";
       position: absolute;
-      width: 14px; height: 14px;
-      left: 2px; top: 2px;
-      background: var(--text3);
-      border-radius: 50%;
-      transition: 0.2s;
-    }
-
-    .toggle input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
-    .toggle input:checked + .toggle-slider::before {
-      transform: translateX(16px);
+      width: 12px; height: 12px;
+      left: 3px; top: 3px;
       background: white;
+      border-radius: 50%;
+      transition: transform 0.18s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .sw input:checked + .sw-t { background: var(--accent); }
+    .sw input:checked + .sw-t::before { transform: translateX(16px); }
+    .sw.disabled .sw-t { opacity: 0.4; cursor: default; }
+
+    /* Stadio badge */
+    .stadio-bar {
+      margin-top: 6px;
+      padding: 6px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      font-size: 11px;
+      color: var(--text2);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    /* Definizione radio */
-    .def-toggle {
-      display: flex;
-      gap: 2px;
-      background: var(--bg3);
-      padding: 3px;
-      border-radius: var(--radius);
-      margin-bottom: 14px;
+    .stadio-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
     }
+
+    /* Definizione */
+    .def-row { display: flex; gap: 5px; }
 
     .def-btn {
       flex: 1;
-      padding: 5px 8px;
-      border: none;
-      border-radius: 4px;
-      background: transparent;
+      padding: 7px 8px;
+      border: 1px solid var(--border2);
+      border-radius: 5px;
+      background: var(--white);
       color: var(--text2);
       font-size: 11px;
+      font-weight: 500;
       cursor: pointer;
-      transition: all 0.15s;
       text-align: center;
+      transition: all 0.15s;
+      line-height: 1.4;
     }
 
-    .def-btn.active {
-      background: var(--bg2);
-      color: var(--text);
-    }
+    .def-btn small { display: block; font-size: 10px; color: var(--text3); margin-top: 1px; }
+    .def-btn.active { border-color: var(--accent); background: var(--accent-bg); color: var(--accent); }
+    .def-btn.active small { color: var(--accent); opacity: 0.7; }
 
-    /* ===== SUBMIT BTN ===== */
+    /* BOTTONE */
     .btn-calc {
       width: 100%;
       padding: 10px;
@@ -297,566 +319,954 @@
       font-weight: 600;
       cursor: pointer;
       transition: background 0.15s;
+      letter-spacing: 0.01em;
+    }
+
+    .btn-calc:hover { background: #1864ab; }
+
+    /* ===== RISULTATI ===== */
+    .res-sticky { position: sticky; top: 62px; }
+
+    /* Empty */
+    .res-empty {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      padding: 56px 20px;
+      color: var(--text3);
+      text-align: center;
       gap: 6px;
     }
 
-    .btn-calc:hover { background: var(--accent2); }
-    .btn-calc:active { transform: scale(0.99); }
+    .res-empty-icon { font-size: 32px; opacity: 0.25; }
 
-    /* ===== RISULTATI ===== */
-    .results-panel { position: sticky; top: 80px; }
-
-    .results-empty {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 20px;
-      color: var(--text3);
-      text-align: center;
-      gap: 10px;
-    }
-
-    .results-empty-icon { font-size: 32px; opacity: 0.4; }
-
-    /* Profilo paziente */
-    .profile-bar {
-      background: var(--bg3);
-      border-radius: var(--radius);
-      padding: 10px 14px;
-      margin-bottom: 16px;
+    /* Profilo */
+    .pprofile {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
+      gap: 5px;
+      margin-bottom: 16px;
+      padding: 10px 14px;
+      background: var(--bg);
+      border-radius: 6px;
+      border: 1px solid var(--border);
     }
 
-    .profile-tag {
-      background: rgba(47,129,247,0.12);
-      border: 1px solid rgba(47,129,247,0.2);
-      color: var(--accent2);
-      padding: 2px 8px;
-      border-radius: 12px;
+    .chip {
+      background: var(--white);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 2px 9px;
       font-size: 11px;
       font-weight: 500;
+      color: var(--text2);
+      white-space: nowrap;
     }
 
-    /* Timeline risultati */
-    .timeline {
+    .chip.hi {
+      background: var(--accent-bg);
+      border-color: var(--accent-lt);
+      color: var(--accent);
+    }
+
+    /* ===== SCENARIO DOPPIO (Prima visita) ===== */
+    .dual-scenarios {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .scenario-col { display: flex; flex-direction: column; gap: 10px; }
+
+    .scenario-header {
+      padding: 9px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
       display: flex;
-      flex-direction: column;
-      gap: 10px;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
     }
 
-    .timeline-row {
-      background: var(--bg3);
+    .sh-pess {
+      background: var(--teal-bg);
+      color: var(--teal);
+      border: 1px solid #99e9f2;
+    }
+
+    .sh-chir {
+      background: var(--accent-bg);
+      color: var(--accent);
+      border: 1px solid var(--accent-lt);
+    }
+
+    /* ===== TIMELINE CARD ===== */
+    .tl-card {
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px 14px;
-      transition: border-color 0.15s;
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--white);
     }
 
-    .timeline-row:hover { border-color: var(--text3); }
-
-    .timeline-header {
+    .tl-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
+      padding: 8px 12px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
     }
 
-    .timeline-t {
+    .tl-t {
       font-size: 12px;
       font-weight: 600;
-      color: var(--text2);
-    }
-
-    .timeline-t strong {
       color: var(--text);
-      font-size: 13px;
     }
 
-    .overall-badge {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 12px;
+    .rbadge {
+      font-size: 10px;
       font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
     }
 
-    .risk-low  { background: rgba(63,185,80,0.15);  color: var(--green);  border: 1px solid rgba(63,185,80,0.2); }
-    .risk-mid  { background: rgba(210,153,34,0.15); color: var(--orange); border: 1px solid rgba(210,153,34,0.2); }
-    .risk-high { background: rgba(248,81,73,0.15);  color: var(--red);    border: 1px solid rgba(248,81,73,0.2); }
+    .rb-low  { background: var(--green-bg);  color: var(--green);  }
+    .rb-mid  { background: var(--orange-bg); color: var(--orange); }
+    .rb-high { background: var(--red-bg);    color: var(--red);    }
 
-    /* Barre stato */
-    .state-bars { display: flex; flex-direction: column; gap: 5px; }
+    .tl-body { padding: 10px 12px; }
 
-    .state-bar-row {
+    /* Righe stato */
+    .srow {
       display: grid;
-      grid-template-columns: 120px 1fr 48px;
+      grid-template-columns: 130px 1fr 40px;
       align-items: center;
       gap: 8px;
+      padding: 3px 0;
     }
 
-    .state-name {
+    .srow + .srow { border-top: 1px solid var(--bg2); }
+
+    .slabel {
       font-size: 11px;
       color: var(--text2);
+      font-weight: 500;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .bar-track {
-      height: 6px;
+    .btrack {
+      height: 7px;
       background: var(--bg2);
-      border-radius: 3px;
+      border-radius: 4px;
       overflow: hidden;
     }
 
-    .bar-fill {
+    .bfill {
       height: 100%;
-      border-radius: 3px;
-      transition: width 0.5s ease;
+      border-radius: 4px;
+      transition: width 0.55s cubic-bezier(0.4,0,0.2,1);
+      min-width: 1px;
     }
 
-    .state-pct {
+    .bpct {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       text-align: right;
-      font-family: var(--font-mono);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
     }
 
-    /* Colori per stato */
-    .c-remissione { background: var(--green); color: var(--green); }
-    .c-ant        { background: var(--orange); color: var(--orange); }
-    .c-post       { background: #e3b341; color: #e3b341; }
-    .c-apic       { background: var(--purple); color: var(--purple); }
-    .c-reint      { background: var(--red); color: var(--red); }
-    .c-pess       { background: var(--teal); color: var(--teal); }
-    .c-chir       { background: var(--accent); color: var(--accent); }
+    /* Colori */
+    .cr  { background:#2f9e44; } .tr  { color:#2f9e44; }
+    .ca  { background:#f76707; } .ta  { color:#f76707; }
+    .cp  { background:#e67700; } .tp  { color:#e67700; }
+    .ck  { background:#6741d9; } .tk  { color:#6741d9; }
+    .cri { background:#c92a2a; } .tri { color:#c92a2a; }
+    .cx  { background:#0c8599; } .tx  { color:#0c8599; }
+    .cb  { background:#1971c2; } .tb  { color:#1971c2; }
+    .cc  { background:#74c0fc; } .tc  { color:#4dabf7; }
 
-    /* ===== DISCLAIMER ===== */
-    .disclaimer {
-      margin-top: 20px;
-      padding: 12px 14px;
-      background: rgba(210,153,34,0.08);
-      border: 1px solid rgba(210,153,34,0.2);
-      border-radius: var(--radius);
+    .sdivider {
+      border: none;
+      border-top: 1px dashed var(--border);
+      margin: 4px 0;
+    }
+
+    /* ===== SINGOLO SCENARIO ===== */
+    .single-timeline { display: flex; flex-direction: column; gap: 10px; }
+
+    /* Disclaimer */
+    .disc {
+      margin-top: 14px;
+      padding: 9px 13px;
+      background: var(--orange-bg);
+      border: 1px solid #ffe08a;
+      border-radius: 6px;
       font-size: 11px;
       color: var(--text2);
       line-height: 1.5;
     }
 
-    .disclaimer strong { color: var(--orange); }
+    .disc strong { color: var(--orange); }
 
-    /* ===== FOOTER ===== */
-    .footer-note {
-      margin-top: 16px;
-      font-size: 11px;
+    .fnote {
+      margin-top: 10px;
+      font-size: 10px;
       color: var(--text3);
       text-align: center;
     }
 
-    .footer-note a { color: var(--text2); text-decoration: none; }
-    .footer-note a:hover { color: var(--text); }
+    .fnote a { color: var(--text3); }
 
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 800px) {
-      .main { grid-template-columns: 1fr; }
-      .results-panel { position: static; }
+    /* RESPONSIVE */
+    @media (max-width: 960px) {
+      .wrap { grid-template-columns: 1fr; }
+      .res-sticky { position: static; }
+      .dual-scenarios { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
 <header class="header">
-  <div class="header-logo">P</div>
-  <div>
-    <div class="header-title">POP Digital Twin</div>
-    <div class="header-subtitle">Decision Support System — Mauriziano Umberto I, Torino</div>
-  </div>
-  <div class="header-badge">v1.0 — Paper 1</div>
+  <div class="hmark">P</div>
+  <span class="htitle">POP Decision Support</span>
+  <span class="hdot">·</span>
+  <span class="hsub">Mauriziano Umberto I, Torino</span>
 </header>
 
-<main class="main">
+<div class="wrap">
 
-  <!-- PANNELLO INPUT -->
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-icon">⚙</div>
-      <h2>Parametri paziente</h2>
+  <!-- FORM -->
+  <div class="card">
+    <div class="card-head">
+      <div class="cicon ci-blue">👤</div>
+      <h2>Profilo paziente</h2>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
 
-      <!-- Tabs ingresso -->
-      <div class="tabs">
-        <button class="tab active" onclick="setTab('s4')">Post-chirurgia</button>
-        <button class="tab" onclick="setTab('s2')">In pessario</button>
-        <button class="tab" onclick="setTab('s1')">Nuova diagnosi</button>
+      <!-- CENTRO -->
+      <div class="fsec">
+        <div class="fsec-title">Centro</div>
+        <select id="save-centro" class="fc">
+          <option value="Mauriziano Umberto I, Torino">Mauriziano Umberto I, Torino</option>
+          <option value="Verduno">Verduno</option>
+          <option value="Test">Test</option>
+        </select>
       </div>
 
-      <!-- TAB S4 -->
-      <div id="tab-s4" class="tab-content active">
-
-        <div class="form-group">
-          <label class="form-label">Tecnica chirurgica</label>
-          <select id="s4-tecnica" class="form-control">
-            <option value="native_ULS">Native tissue ULS</option>
-            <option value="native_SSLF">SSLF (con graft)</option>
-            <option value="native_SSLF_nograft">SSLF (senza graft)</option>
-            <option value="SCP">Sacrocolpopessi (SCP)</option>
-            <option value="VH_MMC">VH + MMC</option>
-            <option value="mesh">Mesh transaddominale</option>
-          </select>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Età <span>(anni)</span></label>
-            <input type="number" id="s4-eta" class="form-control" value="65" min="30" max="90">
-          </div>
-          <div class="form-group">
-            <label class="form-label">BMI <span>(kg/m²)</span></label>
-            <input type="number" id="s4-bmi" class="form-control" value="26" min="18" max="45" step="0.1">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">POP-Q Ba preoperatorio <span>(cm)</span></label>
-          <input type="number" id="s4-ba" class="form-control" value="1" min="-3" max="8" step="0.5">
-        </div>
-
-        <div class="toggle-group">
-          <div class="toggle-item">
-            <div class="toggle-label">
-              Stadio 3-4 preoperatorio
-              <small>POP-Q stadio III o IV</small>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="s4-stadio">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="toggle-item">
-            <div class="toggle-label">
-              Fumo attivo
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="s4-fumo">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="toggle-item">
-            <div class="toggle-label">
-              Levator defect completo
-              <small>Opzionale — richiede ecografia</small>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="s4-levator">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-
-      </div><!-- /tab-s4 -->
-
-      <!-- TAB S2 -->
-      <div id="tab-s2" class="tab-content">
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Età <span>(anni)</span></label>
-            <input type="number" id="s2-eta" class="form-control" value="65" min="30" max="90">
-          </div>
-          <div class="form-group">
-            <label class="form-label">BMI <span>(kg/m²)</span></label>
-            <input type="number" id="s2-bmi" class="form-control" value="26" min="18" max="45" step="0.1">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Tecnica preferita se chirurgia</label>
-          <select id="s2-tecnica" class="form-control">
-            <option value="native_ULS">Native tissue ULS</option>
-            <option value="SCP">Sacrocolpopessi (SCP)</option>
-            <option value="VH_MMC">VH + MMC</option>
-            <option value="native_SSLF">SSLF</option>
-          </select>
-        </div>
-
-        <div class="toggle-group">
-          <div class="toggle-item">
-            <div class="toggle-label">
-              Punto C ≥ 0
-              <small>Prolasso apicale prominente</small>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="s2-c">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="toggle-item">
-            <div class="toggle-label">Stadio 3-4</div>
-            <label class="toggle">
-              <input type="checkbox" id="s2-stadio">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-
-      </div><!-- /tab-s2 -->
-
-      <!-- TAB S1 -->
-      <div id="tab-s1" class="tab-content">
-
-        <div class="form-group">
-          <label class="form-label">Età <span>(anni)</span></label>
-          <input type="number" id="s1-eta" class="form-control" value="65" min="30" max="90">
-        </div>
-
-        <div class="toggle-group">
-          <div class="toggle-item">
-            <div class="toggle-label">
-              Stadio avanzato
-              <small>POP-Q ≥ stadio III</small>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="s1-stadio">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="toggle-item">
-            <div class="toggle-label">
-              Chirurgia pregressa per POP
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="s1-chir">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-
-      </div><!-- /tab-s1 -->
-
-      <!-- Definizione outcome -->
-      <div class="form-group">
-        <label class="form-label">Definizione outcome</label>
-        <div class="def-toggle">
-          <button class="def-btn active" id="def-composita" onclick="setDef('composita')">
-            Composita <br><small style="font-size:10px;color:var(--text3)">anatomia + sintomi + retreat</small>
+      <!-- SITUAZIONE -->
+      <div class="fsec">
+        <div class="fsec-title">Situazione attuale</div>
+        <div class="sit-grid">
+          <button class="sit-btn active" id="sit-s1" onclick="setSit('s1')">
+            <span class="sit-ico">🔍</span>
+            <span class="sit-lbl">Prima visita</span>
           </button>
-          <button class="def-btn" id="def-anatomica" onclick="setDef('anatomica')">
-            Anatomica <br><small style="font-size:10px;color:var(--text3)">POP-Q ≥ 2 puro</small>
+          <button class="sit-btn" id="sit-s2" onclick="setSit('s2')">
+            <span class="sit-ico">🔵</span>
+            <span class="sit-lbl">In pessario</span>
           </button>
+          <button class="sit-btn" id="sit-s4" onclick="setSit('s4')">
+            <span class="sit-ico">✅</span>
+            <span class="sit-lbl">Già operata</span>
+          </button>
+        </div>
+
+        <!-- Ctx pessario -->
+        <div class="ctx" id="ctx-s2">
+          <div class="fg2">
+            <div class="fg">
+              <label class="fl">Da quanto <span class="u">(mesi)</span></label>
+              <input type="number" id="pess-mesi" class="fc" value="6" min="1" max="120">
+            </div>
+            <div class="fg">
+              <label class="fl">Punto C ≥ 0</label>
+              <div style="padding-top:4px">
+                <label class="sw" style="display:inline-block">
+                  <input type="checkbox" id="pess-c">
+                  <span class="sw-t"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ctx operata -->
+        <div class="ctx" id="ctx-s4">
+          <div class="fg">
+            <label class="fl">Tecnica chirurgica usata</label>
+            <select id="s4-tecnica" class="fc">
+              <option value="native_ULS">Native tissue ULS</option>
+              <option value="native_SSLF">SSLF con graft</option>
+              <option value="native_SSLF_nograft">SSLF senza graft</option>
+              <option value="SCP">Sacrocolpopessi (SCP)</option>
+              <option value="VH_MMC">VH + MMC</option>
+              <option value="mesh">Mesh transaddominale</option>
+            </select>
+          </div>
+          <div class="fg" style="margin-top:6px">
+            <label class="fl">Da quanto operata <span class="u">(mesi)</span></label>
+            <input type="number" id="s4-mesi" class="fc" value="1" min="0" max="120">
+          </div>
         </div>
       </div>
 
-      <button class="btn-calc" onclick="calcola()">
-        <span>▶</span> Calcola probabilità
-      </button>
+      <!-- ANAGRAFICI -->
+      <div class="fsec">
+        <div class="fsec-title">Dati anagrafici</div>
+        <div class="fg2">
+          <div class="fg">
+            <label class="fl">Età <span class="u">(anni)</span></label>
+            <input type="number" id="eta" class="fc" value="65" min="30" max="90">
+          </div>
+          <div class="fg">
+            <label class="fl">BMI <span class="u">(kg/m²)</span></label>
+            <input type="number" id="bmi" class="fc" value="26" min="18" max="45" step="0.1">
+          </div>
+        </div>
+      </div>
+
+      <!-- POP-Q -->
+      <div class="fsec">
+        <div class="fsec-title">POP-Q</div>
+        <div class="fg3">
+          <div class="fg">
+            <label class="fl">Aa <span class="u">(cm)</span></label>
+            <input type="number" id="aa" class="fc" value="-1" min="-3" max="3" step="0.5">
+          </div>
+          <div class="fg">
+            <label class="fl">Ba <span class="u">(cm)</span></label>
+            <input type="number" id="ba" class="fc" value="0" min="-3" max="9" step="0.5">
+          </div>
+          <div class="fg">
+            <label class="fl">C <span class="u">(cm)</span></label>
+            <input type="number" id="cc" class="fc" value="-2" min="-9" max="9" step="0.5">
+          </div>
+          <div class="fg">
+            <label class="fl">Ap <span class="u">(cm)</span></label>
+            <input type="number" id="ap" class="fc" value="-2" min="-3" max="3" step="0.5">
+          </div>
+          <div class="fg">
+            <label class="fl">Bp <span class="u">(cm)</span></label>
+            <input type="number" id="bp" class="fc" value="-2" min="-3" max="9" step="0.5">
+          </div>
+          <div class="fg">
+            <label class="fl">D <span class="u">(cm)</span></label>
+            <input type="number" id="dd" class="fc" value="-4" min="-9" max="9" step="0.5">
+          </div>
+          <div class="fg">
+            <label class="fl">GH <span class="u">(cm)</span></label>
+            <input type="number" id="gh" class="fc" value="4" min="1" max="8" step="0.5">
+          </div>
+          <div class="fg">
+            <label class="fl">PB <span class="u">(cm)</span></label>
+            <input type="number" id="pb" class="fc" value="3" min="1" max="6" step="0.5">
+          </div>
+          <div class="fg">
+            <label class="fl">TVL <span class="u">(cm)</span></label>
+            <input type="number" id="tvl" class="fc" value="9" min="5" max="12" step="0.5">
+          </div>
+        </div>
+        <div class="stadio-bar">
+          Stadio POP-Q calcolato:
+          <span class="stadio-val" id="stadio-out">—</span>
+        </div>
+      </div>
+
+      <!-- FATTORI DI RISCHIO -->
+      <div class="fsec">
+        <div class="fsec-title">Fattori di rischio</div>
+        <div class="tgl-list">
+          <div class="tgl-row">
+            <div class="tgl-info"><span class="tgl-lbl">Fumo attivo</span></div>
+            <label class="sw"><input type="checkbox" id="fumo"><span class="sw-t"></span></label>
+          </div>
+          <div class="tgl-row">
+            <div class="tgl-info"><span class="tgl-lbl">Stitichezza cronica</span>
+              <span class="tgl-sub">In raccolta — non ancora nel modello predittivo</span>
+            </div>
+            <label class="sw"><input type="checkbox" id="stitichezza"><span class="sw-t"></span></label>
+          </div>
+          <div class="tgl-row">
+            <div class="tgl-info"><span class="tgl-lbl">Chirurgia POP pregressa</span></div>
+            <label class="sw"><input type="checkbox" id="chirp"><span class="sw-t"></span></label>
+          </div>
+          <div class="tgl-row">
+            <div class="tgl-info">
+              <span class="tgl-lbl">Isterectomia pregressa</span>
+            </div>
+            <label class="sw"><input type="checkbox" id="isterectomia"><span class="sw-t"></span></label>
+          </div>
+          <div class="tgl-row">
+            <div class="tgl-info">
+              <span class="tgl-lbl">Terapia estrogenica locale</span>
+            </div>
+            <label class="sw"><input type="checkbox" id="estrogeni"><span class="sw-t"></span></label>
+          </div>
+          <div class="tgl-row">
+            <div class="tgl-info">
+              <span class="tgl-lbl">Levator defect completo</span>
+              <span class="tgl-sub">Richiede ecografia pavimento pelvico</span>
+            </div>
+            <label class="sw"><input type="checkbox" id="levator"><span class="sw-t"></span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- OSTETRICA E ANAGRAFICA CLINICA -->
+      <div class="fsec">
+        <div class="fsec-title">Anamnesi ostetrica</div>
+        <div class="fg2">
+          <div class="fg">
+            <label class="fl">Parti vaginali</label>
+            <input type="number" id="par-vag" class="fc" value="2" min="0" max="15">
+          </div>
+          <div class="fg">
+            <label class="fl">Parti cesarei</label>
+            <input type="number" id="par-ces" class="fc" value="0" min="0" max="10">
+          </div>
+        </div>
+        <div class="fg2" style="margin-top:8px">
+          <div class="fg">
+            <label class="fl">Menopausa</label>
+            <select id="menopausa" class="fc">
+              <option value="">—</option>
+              <option value="si">Sì</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="fl">Anni dalla menopausa</label>
+            <input type="number" id="anni-meno" class="fc" value="" min="0" max="50" placeholder="—">
+          </div>
+        </div>
+        <div class="fg" style="margin-top:8px">
+          <label class="fl">ASA score</label>
+          <select id="asa" class="fc">
+            <option value="">—</option>
+            <option value="1">ASA 1 — Sana</option>
+            <option value="2">ASA 2 — Malattia lieve</option>
+            <option value="3">ASA 3 — Malattia severa</option>
+            <option value="4">ASA 4 — Rischio vita</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- TECNICA (per s1 e s2: scenario chirurgia) -->
+      <div class="fsec" id="sec-tecnica-gen">
+        <div class="fsec-title" id="lbl-tecnica-gen">Tecnica chirurgica</div>
+        <select id="tecnica-gen" class="fc">
+          <option value="native_ULS">Native tissue ULS</option>
+          <option value="native_SSLF">SSLF con graft</option>
+          <option value="native_SSLF_nograft">SSLF senza graft</option>
+          <option value="SCP">Sacrocolpopessi (SCP)</option>
+          <option value="VH_MMC">VH + MMC</option>
+          <option value="mesh">Mesh transaddominale</option>
+        </select>
+      </div>
+
+      <!-- DEFINIZIONE -->
+      <div class="fsec">
+        <div class="fsec-title">Definizione di recidiva</div>
+        <div class="def-row">
+          <button class="def-btn active" id="def-comp" onclick="setDef('composita')">
+            Composita
+            <small>anatomia + sintomi + retreat</small>
+          </button>
+          <button class="def-btn" id="def-anat" onclick="setDef('anatomica')">
+            Anatomica
+            <small>POP-Q ≥ 2</small>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn-calc" onclick="calcola()">Calcola predizione</button>
+
+      <!-- SEZIONE SALVATAGGIO -->
+      <div class="fsec" id="sec-salva" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border)">
+        <div class="fsec-title">Salva nel registro</div>
+
+        <div class="fg" style="margin-top:6px">
+          <label class="fl">ID anonimo paziente <span class="u">(opzionale)</span></label>
+          <input type="text" id="save-id" class="fc" placeholder="Es. MAU-2025-001">
+        </div>
+
+        <div class="fg" style="margin-top:6px">
+          <label class="fl">Decisione clinica</label>
+          <select id="save-decisione" class="fc">
+            <option value="">— non specificata —</option>
+            <option value="Pessario">Pessario</option>
+            <option value="Chirurgia">Chirurgia</option>
+            <option value="Follow-up">Follow-up osservazionale</option>
+            <option value="In discussione">In discussione con paziente</option>
+          </select>
+        </div>
+
+        <div class="fg" style="margin-top:6px">
+          <label class="fl">Note cliniche libere</label>
+          <textarea id="save-note" class="fc" rows="2"
+            style="resize:vertical; font-family:inherit"
+            placeholder="Osservazioni cliniche, contesto, ecc."></textarea>
+        </div>
+
+        <div class="fg" style="margin-top:6px">
+          <label class="fl">Outcome a follow-up <span class="u">(se visita successiva)</span></label>
+          <select id="save-outcome" class="fc">
+            <option value="">— non ancora disponibile —</option>
+            <option value="Remissione">In remissione</option>
+            <option value="Recidiva anteriore">Recidiva anteriore</option>
+            <option value="Recidiva posteriore">Recidiva posteriore</option>
+            <option value="Recidiva apicale">Recidiva apicale</option>
+            <option value="Re-intervento">Re-intervento</option>
+            <option value="Continua pessario">Continua pessario</option>
+            <option value="Abbandono pessario">Abbandono pessario</option>
+          </select>
+        </div>
+
+        <div class="fg" style="margin-top:6px">
+          <label class="fl">Mesi dal trattamento <span class="u">(se follow-up)</span></label>
+          <input type="number" id="save-followup-mesi" class="fc" placeholder="—" min="0" max="240">
+        </div>
+
+        <button id="btn-salva" onclick="salvaRegistro()"
+          style="width:100%;margin-top:10px;padding:9px;background:var(--green);
+                 border:none;border-radius:var(--radius);color:white;font-size:13px;
+                 font-weight:600;cursor:pointer;transition:background 0.15s">
+          💾 Salva nel registro Google Sheets
+        </button>
+
+        <div id="save-status" style="margin-top:8px;font-size:11px;text-align:center;min-height:16px"></div>
+      </div>
 
     </div>
   </div>
 
-  <!-- PANNELLO RISULTATI -->
-  <div class="panel results-panel" id="results-panel">
-    <div class="panel-header">
-      <div class="panel-icon">📊</div>
-      <h2>Predizione traiettoria</h2>
-    </div>
-    <div class="panel-body" id="results-body">
-      <div class="results-empty">
-        <div class="results-empty-icon">⬡</div>
-        <div>Inserisci i parametri e clicca <strong>Calcola</strong></div>
-        <div style="font-size:11px;color:var(--text3)">La predizione apparirà qui</div>
+  <!-- RISULTATI -->
+  <div class="res-sticky">
+    <div class="card" id="res-card">
+      <div class="card-head">
+        <div class="cicon ci-green">📈</div>
+        <h2 id="res-title">Predizione traiettoria</h2>
+      </div>
+      <div class="card-body" id="res-body">
+        <div class="res-empty">
+          <div class="res-empty-icon">◎</div>
+          <div style="font-size:13px;font-weight:500;color:var(--text3)">Nessuna predizione</div>
+          <div style="font-size:12px;color:var(--border2)">Compila il profilo e clicca Calcola</div>
+        </div>
       </div>
     </div>
   </div>
 
-</main>
+</div>
 
 <script src="params.js"></script>
 <script src="model.js"></script>
 <script>
 
-// ===== STATO GLOBALE =====
-let currentTab = "s4";
-let currentDef = "composita";
+let sit = "s1";
+let def = "composita";
 
-function setTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll(".tab").forEach((b, i) => {
-    b.classList.toggle("active", ["s4","s2","s1"][i] === tab);
-  });
-  document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-  document.getElementById("tab-" + tab).classList.add("active");
+// ===== SITUAZIONE =====
+function setSit(s) {
+  sit = s;
+  ["s1","s2","s4"].forEach(id =>
+    document.getElementById("sit-"+id).classList.toggle("active", id===s));
+  document.getElementById("ctx-s2").classList.toggle("on", s==="s2");
+  document.getElementById("ctx-s4").classList.toggle("on", s==="s4");
+
+  // Tecnica generica: visibile per s1 e s2
+  const secTec = document.getElementById("sec-tecnica-gen");
+  const lblTec = document.getElementById("lbl-tecnica-gen");
+  if (s === "s4") {
+    secTec.style.display = "none";
+  } else {
+    secTec.style.display = "block";
+    lblTec.textContent = s === "s1"
+      ? "Tecnica chirurgica — scenario chirurgia"
+      : "Tecnica chirurgica se andrà a chirurgia";
+  }
+  calcStadio();
 }
 
-function setDef(def) {
-  currentDef = def;
-  document.getElementById("def-composita").classList.toggle("active", def === "composita");
-  document.getElementById("def-anatomica").classList.toggle("active", def === "anatomica");
+function setDef(d) {
+  def = d;
+  document.getElementById("def-comp").classList.toggle("active", d==="composita");
+  document.getElementById("def-anat").classList.toggle("active", d==="anatomica");
 }
 
-// ===== CALCOLO =====
+// ===== STADIO =====
+function calcStadio() {
+  const Ba  = +document.getElementById("ba").value  || 0;
+  const Bp  = +document.getElementById("bp").value  || 0;
+  const C   = +document.getElementById("cc").value  || 0;
+  const TVL = +document.getElementById("tvl").value || 9;
+  const mx = Math.max(Ba, Bp, C);
+  let s;
+  if (mx <= -(TVL-2)) s = "0";
+  else if (mx < -1)   s = "I";
+  else if (mx <= 1)   s = "II";
+  else if (mx < TVL-2)s = "III";
+  else                s = "IV";
+  document.getElementById("stadio-out").textContent = "Stadio " + s;
+  return ["0","I","II","III","IV"].indexOf(s);
+}
+
+["ba","bp","cc","tvl"].forEach(id =>
+  document.getElementById(id).addEventListener("input", calcStadio));
+
+// ===== LEGGI FORM =====
+function leggi() {
+  const eta    = +document.getElementById("eta").value    || 65;
+  const BMI    = +document.getElementById("bmi").value    || 26;
+  const Ba     = +document.getElementById("ba").value     || 0;
+  const C      = +document.getElementById("cc").value     || -2;
+  const TVL    = +document.getElementById("tvl").value    || 9;
+  const GH     = +document.getElementById("gh").value     || 4;
+  const fumo   = document.getElementById("fumo").checked;
+  const chirp  = document.getElementById("chirp").checked;
+  const levator= document.getElementById("levator").checked;
+  const si     = calcStadio();
+  const stadio_34 = si >= 3;
+  const stadioAvanzato = si >= 2;
+  return { eta, BMI, Ba, C, TVL, GH, fumo, chirp, levator, stadio_34, stadioAvanzato };
+}
+
+// ===== CALCOLA =====
 function calcola() {
-  let risultati, profilo, statoLabel;
+  const f = leggi();
+  const body = document.getElementById("res-body");
+  const titolo = document.getElementById("res-title");
 
-  if (currentTab === "s4") {
-    const p = {
-      tecnica:        document.getElementById("s4-tecnica").value,
-      eta:            parseFloat(document.getElementById("s4-eta").value),
-      BMI:            parseFloat(document.getElementById("s4-bmi").value),
-      Ba_preop:       parseFloat(document.getElementById("s4-ba").value),
-      stadio_34:      document.getElementById("s4-stadio").checked,
-      fumo:           document.getElementById("s4-fumo").checked,
-      levator_defect: document.getElementById("s4-levator").checked,
-      definizione:    currentDef,
-      tMesi:          [12, 24, 36, 60, 120]
-    };
-    risultati = ingressoS4(p);
-    statoLabel = "Post-chirurgia";
-    profilo = [
-      PARAMS.tecniche[p.tecnica],
-      `Età ${p.eta}a`,
-      `BMI ${p.BMI}`,
-      `Ba ${p.Ba_preop > 0 ? "+" : ""}${p.Ba_preop}cm`,
-      p.stadio_34 ? "Stadio 3-4" : null,
-      p.fumo ? "Fumatrice" : null,
-      p.levator_defect ? "Levator defect" : null,
-      currentDef
-    ].filter(Boolean);
+  // Chips profilo
+  const stadioStr = document.getElementById("stadio-out").textContent;
+  const chips = [
+    { t: sit==="s1"?"Prima visita":sit==="s2"?"In pessario":"Già operata", hi:true },
+    { t: `Età ${f.eta}a` },
+    { t: `BMI ${f.BMI}` },
+    { t: stadioStr },
+    { t: `Ba ${f.Ba>=0?"+":""}${f.Ba}` },
+    { t: `C ${f.C>=0?"+":""}${f.C}` },
+    { t: `GH ${f.GH}cm` },
+    f.fumo    ? { t: "Fumo" } : null,
+    f.levator ? { t: "Levator defect" } : null,
+    { t: def==="composita"?"Composita":"Anatomica" },
+  ].filter(Boolean);
 
-  } else if (currentTab === "s2") {
-    const p = {
-      tecnica:     document.getElementById("s2-tecnica").value,
-      eta:         parseFloat(document.getElementById("s2-eta").value),
-      BMI:         parseFloat(document.getElementById("s2-bmi").value),
-      punto_C_ge0: document.getElementById("s2-c").checked,
-      stadio_34:   document.getElementById("s2-stadio").checked,
-      definizione: currentDef,
-      tMesi:       [12, 24, 36, 60, 120]
+  const profHtml = chips.map(c =>
+    `<span class="chip${c.hi?" hi":""}">${c.t}</span>`).join("");
+
+  if (sit === "s1") {
+    // DOPPIO SCENARIO
+    titolo.textContent = "Confronto scenari — Prima visita";
+    const tecnica = document.getElementById("tecnica-gen").value;
+    const nomeTec = PARAMS.tecniche[tecnica];
+
+    const parPess = {
+      tecnica, BMI:f.BMI, Ba_preop:f.Ba,
+      stadio_34:f.stadio_34, eta:f.eta,
+      punto_C_ge0: f.C >= 0,
+      definizione: def,
+      tMesi: [12, 36, 60, 120]
     };
-    risultati = ingressoS2(p);
-    statoLabel = "In pessario";
-    profilo = [
-      `Età ${p.eta}a`,
-      `BMI ${p.BMI}`,
-      p.punto_C_ge0 ? "C ≥ 0" : null,
-      p.stadio_34 ? "Stadio 3-4" : null,
-      currentDef
-    ].filter(Boolean);
+
+    const parChir = {
+      tecnica, BMI:f.BMI, Ba_preop:f.Ba,
+      stadio_34:f.stadio_34, fumo:f.fumo,
+      eta:f.eta, levator_defect:f.levator,
+      definizione: def,
+      tMesi: [12, 36, 60, 120]
+    };
+
+    const rPess = ingressoS2(parPess);
+    const rChir = ingressoS4(parChir);
+    ultimePredizioni.s2 = rPess;
+    ultimePredizioni.s4 = rChir;
+
+    const pessCol = rPess.map(r => renderCard(r, "s2")).join("");
+    const chirCol = rChir.map(r => renderCard(r, "s4")).join("");
+
+    body.innerHTML = `
+      <div class="pprofile">${profHtml}
+        <span class="chip" style="background:var(--teal-bg);border-color:#99e9f2;color:var(--teal)">
+          Tecnica: ${nomeTec}
+        </span>
+      </div>
+      <div class="dual-scenarios">
+        <div class="scenario-col">
+          <div class="scenario-header sh-pess">🔵 Scenario pessario</div>
+          ${pessCol}
+        </div>
+        <div class="scenario-col">
+          <div class="scenario-header sh-chir">⚕ Scenario chirurgia</div>
+          ${chirCol}
+        </div>
+      </div>
+      ${disclaimer()}`;
+
+  } else if (sit === "s2") {
+    // DOPPIO SCENARIO: continua pessario vs chirurgia adesso
+    titolo.textContent = "Confronto scenari — In pessario";
+    const tecnica = document.getElementById("tecnica-gen").value;
+    const nomeTec = PARAMS.tecniche[tecnica];
+
+    const parPess = {
+      tecnica, BMI:f.BMI, Ba_preop:f.Ba,
+      stadio_34:f.stadio_34, eta:f.eta,
+      punto_C_ge0: document.getElementById("pess-c").checked,
+      definizione: def,
+      tMesi: [12, 36, 60, 120]
+    };
+
+    const parChir = {
+      tecnica, BMI:f.BMI, Ba_preop:f.Ba,
+      stadio_34:f.stadio_34, fumo:f.fumo,
+      eta:f.eta, levator_defect:f.levator,
+      definizione: def,
+      tMesi: [12, 36, 60, 120]
+    };
+
+    const rPess = ingressoS2(parPess);
+    const rChir = ingressoS4(parChir);
+    ultimePredizioni.s2 = rPess;
+    ultimePredizioni.s4 = rChir;
+
+    const pessCol = rPess.map(r => renderCard(r, "s2")).join("");
+    const chirCol = rChir.map(r => renderCard(r, "s4")).join("");
+
+    body.innerHTML = `
+      <div class="pprofile">${profHtml}
+        <span class="chip" style="background:var(--teal-bg);border-color:#99e9f2;color:var(--teal)">
+          Tecnica: ${nomeTec}
+        </span>
+      </div>
+      <div class="dual-scenarios">
+        <div class="scenario-col">
+          <div class="scenario-header sh-pess">🔵 Continua pessario</div>
+          ${pessCol}
+        </div>
+        <div class="scenario-col">
+          <div class="scenario-header sh-chir">⚕ Chirurgia adesso</div>
+          ${chirCol}
+        </div>
+      </div>
+      ${disclaimer()}`;
 
   } else {
-    const p = {
-      eta:                parseFloat(document.getElementById("s1-eta").value),
-      stadio_avanzato:    document.getElementById("s1-stadio").checked,
-      chirurgia_pregressa: document.getElementById("s1-chir").checked,
-      definizione:        currentDef,
-      tMesi:              [3, 12, 36, 60]
+    titolo.textContent = "Predizione — Post-chirurgia";
+    const tecnica = document.getElementById("s4-tecnica").value;
+    const nomeTec = PARAMS.tecniche[tecnica];
+    const par = {
+      tecnica, BMI:f.BMI, Ba_preop:f.Ba,
+      stadio_34:f.stadio_34, fumo:f.fumo,
+      eta:f.eta, levator_defect:f.levator,
+      definizione: def,
+      tMesi: [12, 36, 60, 120]
     };
-    risultati = ingressoS1(p);
-    statoLabel = "Nuova diagnosi";
-    profilo = [
-      `Età ${p.eta}a`,
-      p.stadio_avanzato ? "Stadio avanzato" : null,
-      p.chirurgia_pregressa ? "Chir. pregressa" : null,
-      currentDef
-    ].filter(Boolean);
+    const res = ingressoS4(par);
+    ultimePredizioni.s4 = res;
+    ultimePredizioni.s2 = null;
+    body.innerHTML = `
+      <div class="pprofile">${profHtml}
+        <span class="chip">${nomeTec}</span>
+      </div>
+      <div class="single-timeline">
+        ${res.map(r => renderCard(r, "s4")).join("")}
+      </div>
+      ${disclaimer()}`;
   }
 
-  renderRisultati(risultati, profilo, statoLabel);
+  // Mostra sezione salvataggio
+  document.getElementById("sec-salva").style.display = "block";
 }
 
-// ===== RENDERING =====
-function renderRisultati(risultati, profilo, statoLabel) {
-  const body = document.getElementById("results-body");
+// ===== RENDER CARD =====
+function renderCard(r, tipo) {
+  const tMesi = r.t_mesi;
+  const y = tMesi / 12;
+  const tLabel = tMesi < 12
+    ? `${tMesi} mesi`
+    : `${y} ann${y===1?"o":"i"}`;
 
-  const profiloHtml = profilo.map(p =>
-    `<span class="profile-tag">${p}</span>`).join("");
+  // Rischio per badge
+  let rv = 0;
+  if (tipo === "s4") rv = (r.P_rec_ant||0)+(r.P_rec_post||0)+(r.P_rec_apic||0)+(r.P_reintervento||0);
+  else rv = (r.P_chirurgia||0);
 
-  const timelineHtml = risultati.map(r => {
-    const tLabel = r.t_mesi >= 12
-      ? `${r.t_mesi/12} ann${r.t_mesi/12 === 1 ? "o" : "i"}`
-      : `${r.t_mesi} mesi`;
+  const rc = rv<0.15?"rb-low":rv<0.35?"rb-mid":"rb-high";
+  const rl = rv<0.15?"Basso":rv<0.35?"Moderato":"Elevato";
 
-    // Calcola rischio complessivo
-    const pFail = currentTab === "s4"
-      ? (r.P_rec_ant || 0) + (r.P_rec_post || 0) + (r.P_rec_apic || 0) + (r.P_reintervento || 0)
-      : (r.P_chirurgia || 0);
+  let righe = "";
 
-    const riskClass = pFail < 0.15 ? "risk-low"
-      : pFail < 0.35 ? "risk-mid" : "risk-high";
-    const riskLabel = pFail < 0.15 ? "Basso rischio"
-      : pFail < 0.35 ? "Rischio moderato" : "Alto rischio";
+  if (tipo === "s4") {
+    righe = [
+      ["Remissione",         r.P_remissione,   "cr","tr"],
+      ["Rec. anteriore",     r.P_rec_ant,      "ca","ta"],
+      ["Rec. posteriore",    r.P_rec_post,     "cp","tp"],
+      ["Rec. apicale",       r.P_rec_apic,     "ck","tk"],
+      ["Re-intervento",      r.P_reintervento, "cri","tri"],
+    ].map(s => row(s[0],s[1],s[2],s[3])).join("");
 
-    let barre = "";
+  } else {
+    // s2: pessario + chirurgia + remissione + recidiva + reintervento + conservativa
+    righe = [
+      ["In pessario",        r.P_pessario,     "cx","tx"],
+      ["Verso chirurgia",    r.P_chirurgia,    "cb","tb"],
+      null,
+      ["In remissione",      r.P_remissione,   "cr","tr"],
+      ["Rec. anteriore",     r.P_rec_ant,      "ca","ta"],
+      ["Re-intervento",      r.P_reintervento, "cri","tri"],
+      ["Rem. conservativa",  r.P_conservativa, "cc","tc"],
+    ].map(s => s ? row(s[0],s[1],s[2],s[3]) : `<hr class="sdivider">`).join("");
+  }
 
-    if (currentTab === "s4") {
-      barre = [
-        { nome: "Remissione",       val: r.P_remissione,   cls: "c-remissione" },
-        { nome: "Recidiva ant.",     val: r.P_rec_ant,      cls: "c-ant"  },
-        { nome: "Recidiva post.",    val: r.P_rec_post,     cls: "c-post" },
-        { nome: "Recidiva apicale", val: r.P_rec_apic,     cls: "c-apic" },
-        { nome: "Re-intervento",    val: r.P_reintervento, cls: "c-reint" }
-      ].map(s => renderBarra(s.nome, s.val, s.cls)).join("");
-
-    } else if (currentTab === "s2") {
-      barre = [
-        { nome: "In pessario",    val: r.P_pessario,     cls: "c-pess" },
-        { nome: "Verso chirurgia",val: r.P_chirurgia,    cls: "c-chir" },
-        { nome: "In remissione",  val: r.P_remissione,   cls: "c-remissione" },
-        { nome: "Recidiva ant.",  val: r.P_rec_ant,      cls: "c-ant"  },
-        { nome: "Re-intervento",  val: r.P_reintervento, cls: "c-reint" },
-        { nome: "Rem. conserv.",  val: r.P_conservativa, cls: "c-teal" }
-      ].map(s => renderBarra(s.nome, s.val, s.cls)).join("");
-
-    } else {
-      barre = [
-        { nome: "Sceglie pessario",  val: r.P_pessario,   cls: "c-pess" },
-        { nome: "Sceglie chirurgia", val: r.P_chirurgia,  cls: "c-chir" },
-        { nome: "In remissione",     val: r.P_remissione, cls: "c-remissione" }
-      ].map(s => renderBarra(s.nome, s.val, s.cls)).join("");
-    }
-
-    return `
-      <div class="timeline-row">
-        <div class="timeline-header">
-          <div class="timeline-t">A <strong>${tLabel}</strong></div>
-          <span class="overall-badge ${riskClass}">${riskLabel}</span>
-        </div>
-        <div class="state-bars">${barre}</div>
-      </div>`;
-  }).join("");
-
-  body.innerHTML = `
-    <div class="profile-bar">${profiloHtml}</div>
-    <div class="timeline">${timelineHtml}</div>
-    <div class="disclaimer">
-      <strong>⚠ Uso esplorativo</strong> — Modello parametrizzato su 28 studi internazionali (~50.000 pazienti).
-      Le probabilità sono stime population-based. Non sostituisce il giudizio clinico individuale.
-      Validazione esterna in corso (Paper 1). Aggiornamento con dati Mauriziano previsto (Paper 2).
-    </div>
-    <div class="footer-note">
-      Multi-state model · Baseline: OPTIMAL 2018 · 
-      <a href="https://github.com" target="_blank">Codice su GitHub</a>
-    </div>`;
-}
-
-function renderBarra(nome, val, colorCls) {
-  const pct = Math.round((val || 0) * 100);
-  const width = Math.min(pct, 100);
   return `
-    <div class="state-bar-row">
-      <span class="state-name">${nome}</span>
-      <div class="bar-track">
-        <div class="bar-fill ${colorCls}" style="width:${width}%"></div>
+    <div class="tl-card">
+      <div class="tl-head">
+        <span class="tl-t">A ${tLabel}</span>
+        <span class="rbadge ${rc}">${rl}</span>
       </div>
-      <span class="state-pct ${colorCls}">${pct}%</span>
+      <div class="tl-body">${righe}</div>
     </div>`;
 }
+
+function row(label, val, bc, tc) {
+  const v = val||0;
+  const pct = Math.round(v*100);
+  return `
+    <div class="srow">
+      <span class="slabel">${label}</span>
+      <div class="btrack">
+        <div class="bfill ${bc}" style="width:${Math.min(pct,100)}%"></div>
+      </div>
+      <span class="bpct ${tc}">${pct}%</span>
+    </div>`;
+}
+
+function disclaimer() {
+  return `
+    <div class="disc">
+      <strong>Uso esplorativo</strong> — Modello parametrizzato su 28 studi internazionali (~50.000 pazienti).
+      Stime population-based. Non sostituisce il giudizio clinico individuale.
+    </div>
+    <div class="fnote">Multi-state model · Baseline OPTIMAL 2018 · <a href="https://github.com" target="_blank">GitHub</a></div>`;
+}
+
+// ===== STORAGE PREDIZIONI PER SALVATAGGIO =====
+let ultimePredizioni = { s4: null, s2: null };
+
+// ===== SALVA NEL REGISTRO =====
+// IMPORTANTE: sostituisci APPS_SCRIPT_URL con l'URL del tuo Google Apps Script
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyKUHNyHKw6mOjMlXhlwz5XKZdlEunEdcyJm2ROKCoXTY2S6RTR1AnqsSDJXyub3nWr/exec";
+
+function salvaRegistro() {
+  const btn    = document.getElementById("btn-salva");
+  const status = document.getElementById("save-status");
+
+  if (APPS_SCRIPT_URL === "INSERISCI_URL_APPS_SCRIPT_QUI") {
+    status.textContent = "⚠ Configura APPS_SCRIPT_URL in index.html";
+    status.style.color = "var(--orange)";
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Salvataggio in corso...";
+  status.textContent = "";
+
+  const f = leggi();
+  const stadioStr = document.getElementById("stadio-out").textContent;
+
+  // Tecnica corrente
+  let tecnicaVal = "";
+  if (sit === "s4") tecnicaVal = document.getElementById("s4-tecnica").value;
+  else tecnicaVal = document.getElementById("tecnica-gen").value;
+
+  const payload = {
+    // Metadati
+    id_anonimo:  document.getElementById("save-id").value.trim(),
+    centro:      document.getElementById("save-centro").value.trim(),
+    situazione:  sit === "s1" ? "Prima visita" : sit === "s2" ? "In pessario" : "Già operata",
+    definizione: def,
+
+    // Anagrafica
+    eta:  f.eta,
+    bmi:  f.BMI,
+
+    // Ostetrica
+    parita_vaginale:      parseInt(document.getElementById("par-vag").value)  || 0,
+    parita_cesarei:       parseInt(document.getElementById("par-ces").value)  || 0,
+    menopausa:            document.getElementById("menopausa").value === "si",
+    anni_menopausa:       parseInt(document.getElementById("anni-meno").value) || "",
+    estrogeni_locali:     document.getElementById("estrogeni").checked,
+    isterectomia_pregressa: document.getElementById("isterectomia").checked,
+    asa:                  document.getElementById("asa").value,
+
+    // POP-Q
+    aa:  document.getElementById("aa").value,
+    ba:  document.getElementById("ba").value,
+    c:   document.getElementById("cc").value,
+    ap:  document.getElementById("ap").value,
+    bp:  document.getElementById("bp").value,
+    dd:  document.getElementById("dd").value,
+    gh:  document.getElementById("gh").value,
+    pb:  document.getElementById("pb").value,
+    tvl: document.getElementById("tvl").value,
+    stadio: stadioStr,
+
+    // Fattori rischio
+    fumo:                document.getElementById("fumo").checked,
+    stitichezza:         document.getElementById("stitichezza").checked,
+    chirurgia_pregressa: document.getElementById("chirp").checked,
+    levator_defect:      document.getElementById("levator").checked,
+
+    // Situazione specifica
+    tecnica:      tecnicaVal,
+    pessario_mesi: sit === "s2" ? (document.getElementById("pess-mesi").value || "") : "",
+    punto_c_ge0:   sit === "s2" ? document.getElementById("pess-c").checked : false,
+
+    // Predizioni
+    predizioni_s4: ultimePredizioni.s4 || [],
+    predizioni_s2: ultimePredizioni.s2 || [],
+
+    // Decisione e note
+    decisione:       document.getElementById("save-decisione").value,
+    note:            document.getElementById("save-note").value.trim(),
+    outcome_followup: document.getElementById("save-outcome").value,
+    followup_mesi:   document.getElementById("save-followup-mesi").value || ""
+  };
+
+  fetch(APPS_SCRIPT_URL, {
+    method:  "POST",
+    headers: { "Content-Type": "text/plain" },
+    body:    JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.status === "ok") {
+      status.textContent = "✓ Salvato correttamente";
+      status.style.color = "var(--green)";
+      btn.textContent = "💾 Salva nel registro Google Sheets";
+    } else {
+      throw new Error(data.message || "Errore sconosciuto");
+    }
+  })
+  .catch(err => {
+    status.textContent = "✗ Errore: " + err.message;
+    status.style.color = "var(--red)";
+    btn.textContent = "💾 Salva nel registro Google Sheets";
+  })
+  .finally(() => { btn.disabled = false; });
+}
+
+// Init
+setSit("s1");
+calcStadio();
 
 </script>
 </body>
