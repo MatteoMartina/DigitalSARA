@@ -694,6 +694,10 @@
             <label class="sw"><input type="checkbox" id="stitichezza"><span class="sw-t"></span></label>
           </div>
           <div class="tgl-row">
+            <div class="tgl-info"><span class="tgl-lbl">Diabete</span></div>
+            <label class="sw"><input type="checkbox" id="diabete"><span class="sw-t"></span></label>
+          </div>
+          <div class="tgl-row">
             <div class="tgl-info"><span class="tgl-lbl">Chirurgia POP pregressa</span></div>
             <label class="sw"><input type="checkbox" id="chirp"><span class="sw-t"></span></label>
           </div>
@@ -746,16 +750,7 @@
             <input type="number" id="anni-meno" class="fc" value="" min="0" max="50" placeholder="—">
           </div>
         </div>
-        <div class="fg" style="margin-top:8px">
-          <label class="fl">ASA score</label>
-          <select id="asa" class="fc">
-            <option value="">—</option>
-            <option value="1">ASA 1 — Sana</option>
-            <option value="2">ASA 2 — Malattia lieve</option>
-            <option value="3">ASA 3 — Malattia severa</option>
-            <option value="4">ASA 4 — Rischio vita</option>
-          </select>
-        </div>
+
       </div>
 
       <!-- TECNICA (per s1 e s2: scenario chirurgia) -->
@@ -1205,7 +1200,7 @@ function salvaRegistro() {
     anni_menopausa:       parseInt(document.getElementById("anni-meno").value) || "",
     estrogeni_locali:     document.getElementById("estrogeni").checked,
     isterectomia_pregressa: document.getElementById("isterectomia").checked,
-    asa:                  document.getElementById("asa").value,
+    diabete:              document.getElementById("diabete").checked,
 
     // POP-Q
     aa:  document.getElementById("aa").value,
