@@ -1241,27 +1241,29 @@ function salvaRegistro() {
     followup_mesi:   document.getElementById("save-followup-mesi").value || ""
   };
 
+  // CORS workaround: usa no-cors con form data
+  // Con no-cors non riceviamo risposta — assumiamo successo se non lancia
+  const formData = new FormData();
+  formData.append("data", JSON.stringify(payload));
+
   fetch(APPS_SCRIPT_URL, {
-    method:  "POST",
-    headers: { "Content-Type": "text/plain" },
-    body:    JSON.stringify(payload)
+    method: "POST",
+    mode:   "no-cors",
+    body:   formData
   })
-  .then(r => r.json())
-  .then(data => {
-    if (data.status === "ok") {
-      status.textContent = "✓ Salvato correttamente";
-      status.style.color = "var(--green)";
-      btn.textContent = "💾 Salva nel registro Google Sheets";
-    } else {
-      throw new Error(data.message || "Errore sconosciuto");
-    }
+  .then(() => {
+    // Con no-cors non possiamo leggere la risposta — mostriamo successo ottimistico
+    status.textContent = "✓ Inviato al registro";
+    status.style.color = "var(--green)";
+    btn.textContent = "💾 Salva nel registro Google Sheets";
+    btn.disabled = false;
   })
   .catch(err => {
-    status.textContent = "✗ Errore: " + err.message;
+    status.textContent = "✗ Errore di rete: " + err.message;
     status.style.color = "var(--red)";
     btn.textContent = "💾 Salva nel registro Google Sheets";
-  })
-  .finally(() => { btn.disabled = false; });
+    btn.disabled = false;
+  });
 }
 
 // Init
